@@ -12,6 +12,22 @@ function selectSeat(seat, el) {
     el.classList.add('seat-selected');
 }
 
+function seatButtonClick(event) {
+    const el = event.currentTarget;
+    const seat = el.dataset.seat;
+    if (!seat) return;
+    selectSeat(seat, el);
+}
+
+function initSeatSelection() {
+    document.querySelectorAll('.seat-btn[data-seat]:not(:disabled)').forEach(btn => {
+        btn.removeEventListener('click', seatButtonClick);
+        btn.addEventListener('click', seatButtonClick);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', initSeatSelection);
+
 function autoRefresh() {
     const route = document.querySelector('[name="route"]').value;
     const date = document.querySelector('[name="travel_date"]').value;

@@ -59,6 +59,7 @@
                                         {% else %}
                                                 <button type="button"
                                                     class="btn {% if seat in booked_seats %}btn-secondary{% else %}btn-outline-primary{% endif %} seat-btn me-2"
+                                                    data-seat="{{ seat }}"
                                                     {% if seat in booked_seats %}disabled{% else %}onclick="selectSeat('{{ seat }}', this)"{% endif %}>
                                                 {{ seat }}
                                             </button>
