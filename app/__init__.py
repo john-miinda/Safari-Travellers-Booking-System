@@ -27,9 +27,12 @@ def ensure_database_schema():
         "ALTER TABLE bookings ADD COLUMN IF NOT EXISTS total_price DOUBLE PRECISION DEFAULT 1650.0",
         "ALTER TABLE buses ADD COLUMN IF NOT EXISTS price DOUBLE PRECISION DEFAULT 1650.0",
     ]
-    with db.engine.begin() as conn:
-        for stmt in statements:
-            conn.execute(text(stmt))
+    try:
+        with db.engine.begin() as conn:
+            for stmt in statements:
+                conn.execute(text(stmt))
+    except Exception as e:
+        current_app.logger.error(f"Error ensuring database schema: {e}")
 
 
 def seed_default_admin():
@@ -41,64 +44,70 @@ def seed_default_admin():
     if not admin_email or not admin_password:
         return
 
-    admin_user = User.query.filter_by(email=admin_email).first()
-    if not admin_user:
-        admin_user = User(
-            fullname='Administrator',
-            email=admin_email,
-            password=generate_password_hash(admin_password),
-            is_admin=True,
-        )
-        db.session.add(admin_user)
-        db.session.commit()
-    elif not admin_user.is_admin:
-        admin_user.is_admin = True
-        db.session.commit()
+    try:
+        admin_user = User.query.filter_by(email=admin_email).first()
+        if not admin_user:
+            admin_user = User(
+                fullname='Administrator',
+                email=admin_email,
+                password=generate_password_hash(admin_password),
+                is_admin=True,
+            )
+            db.session.add(admin_user)
+            db.session.commit()
+        elif not admin_user.is_admin:
+            admin_user.is_admin = True
+            db.session.commit()
+    except Exception as e:
+        current_app.logger.error(f"Error seeding admin user: {e}")
 
 
 def seed_demo_buses():
     from app.models import Bus
 
-    existing_count = Bus.query.count()
-    if existing_count >= 50:
-        return
+    try:
+        existing_count = Bus.query.count()
+        if existing_count >= 50:
+            return
 
-    routes = [
-        'Nairobi - Mombasa',
-        'Nairobi - Kisumu',
-        'Nairobi - Nakuru',
-        'Nakuru - Eldoret',
-        'Mombasa - Malindi',
-    ]
-    departure_times = [
-        '05:30 AM', '07:00 AM', '08:30 AM', '10:00 AM', '11:30 AM',
-        '01:00 PM', '02:30 PM', '04:00 PM', '05:30 PM', '07:00 PM',
-    ]
-    created = 0
-    existing_names = {bus.bus_name for bus in Bus.query.all()}
+        routes = [
+            'Nairobi - Mombasa',
+            'Nairobi - Kisumu',
+            'Nairobi - Nakuru',
+            'Nakuru - Eldoret',
+            'Mombasa - Malindi',
+        ]
+        departure_times = [
+            '05:30 AM', '07:00 AM', '08:30 AM', '10:00 AM', '11:30 AM',
+            '01:00 PM', '02:30 PM', '04:00 PM', '05:30 PM', '07:00 PM',
+        ]
+        created = 0
+        existing_names = {bus.bus_name for bus in Bus.query.all()}
 
-    for route in routes:
-        for departure in departure_times:
+        for route in routes:
+            for departure in departure_times:
+                if created >= 50 - existing_count:
+                    break
+                bus_name = f"Safari {route.split(' - ')[0]} {departure.replace(':', '').replace(' ', '')}"
+                if bus_name in existing_names:
+                    continue
+                bus = Bus(
+                    bus_name=bus_name,
+                    route=route,
+                    departure_time=departure,
+                    total_seats=18,
+                    price=1650.0,
+                )
+                db.session.add(bus)
+                existing_names.add(bus_name)
+                created += 1
             if created >= 50 - existing_count:
                 break
-            bus_name = f"Safari {route.split(' - ')[0]} {departure.replace(':', '').replace(' ', '')}"
-            if bus_name in existing_names:
-                continue
-            bus = Bus(
-                bus_name=bus_name,
-                route=route,
-                departure_time=departure,
-                total_seats=18,
-                price=1650.0,
-            )
-            db.session.add(bus)
-            existing_names.add(bus_name)
-            created += 1
-        if created >= 50 - existing_count:
-            break
 
-    if created > 0:
-        db.session.commit()
+        if created > 0:
+            db.session.commit()
+    except Exception as e:
+        current_app.logger.error(f"Error seeding demo buses: {e}")
 
 
 def create_app():
@@ -124,9 +133,12 @@ def create_app():
         app.logger.info('Safari Travellers Booking System starting')
 
     with app.app_context():
-        db.create_all()
-        ensure_database_schema()
-        seed_default_admin()
-        seed_demo_buses()
+        try:
+            db.create_all()
+            ensure_database_schema()
+            seed_default_admin()
+            seed_demo_buses()
+        except Exception as e:
+            app.logger.error(f"Error during app initialization: {e}")
 
-    return app  
+    return app
