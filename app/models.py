@@ -17,14 +17,14 @@ class User(UserMixin, db.Model):
     bookings = db.relationship('Booking', back_populates='user', cascade='all, delete-orphan')
 
     def get_reset_token(self, expires_sec=1800):
-        s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
+        s = Serializer(current_app.config['SECRET_KEY'])
         return s.dumps({'user_id': self.id})
 
     @staticmethod
-    def verify_reset_token(token):
+    def verify_reset_token(token, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
-            data = s.loads(token)
+            data = s.loads(token, max_age=expires_sec)
         except Exception:
             return None
         return User.query.get(data.get('user_id'))
