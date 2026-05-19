@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow-sm border-0 p-4 mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <h3 class="mb-1">Search Buses</h3>
+                    <p class="text-muted mb-0">Find the right coach for your travel date.</p>
+                </div>
+                <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">Back to Dashboard</a>
+            </div>
+
+            <form class="row g-3" method="GET">
+                <div class="col-md-5">
+                    <label class="form-label">Route</label>
+                    <select name="route" class="form-select" required>
+                        <option value="">Select Route</option>
+                        {% for route in routes %}
+                            <option value="{{ route }}" {% if route == selected_route %}selected{% endif %}>{{ route }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Travel Date</label>
+                    <input type="date" name="travel_date" value="{{ selected_date }}" class="form-control" required>
+                </div>
+                <div class="col-md-3 align-self-end">
+                    <button class="btn btn-primary w-100">Search Buses</button>
+                </div>
+            </form>
+        </div>
+
+        {% if buses is not none %}
+            {% if buses %}
+                <div class="row g-4">
+                    {% for bus in buses %}
+                        <div class="col-md-6">
+                            <div class="card shadow-sm border-0 bus-card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <div>
+                                            <h5 class="mb-1">{{ bus.bus_name }}</h5>
+                                            <p class="text-muted mb-0">{{ bus.route }}</p>
+                                        </div>
+                                        <span class="badge bg-success">{{ bus.available }} seats left</span>
+                                    </div>
+                                    <ul class="list-unstyled mb-3">
+                                        <li><strong>Departure:</strong> {{ bus.departure_time }}</li>
+                                        <li><strong>Bus capacity:</strong> {{ bus.total_seats }} seats</li>
+                                        <li><strong>Price:</strong> KES {{ bus.price | round(2) }}</li>
+                                    </ul>
+                                    <a href="{{ url_for('main.book_ticket', bus_id=bus.id, travel_date=selected_date) }}" class="btn btn-outline-primary w-100">Select Bus</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% elif selected_route and selected_date %}
+                <div class="card shadow-sm border-0 p-4 mt-3">
+                    <p class="mb-0 text-muted">No buses are available for the selected route and date.</p>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

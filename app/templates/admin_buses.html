@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row gy-4">
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 p-4">
+            <h4 class="mb-3">Add New Bus</h4>
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Bus Name</label>
+                    <input type="text" name="bus_name" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Route</label>
+                    <input type="text" name="route" class="form-control" placeholder="Nairobi - Mombasa" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Departure Time</label>
+                    <input type="text" name="departure_time" class="form-control" placeholder="08:30 AM" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Total Seats</label>
+                    <input type="number" name="total_seats" class="form-control" min="10" value="18" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Price (KES)</label>
+                    <input type="number" step="0.01" name="price" class="form-control" value="1650.00" required>
+                </div>
+                <button class="btn btn-primary">Add Bus</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 p-4">
+            <h4 class="mb-3">Current Fleets</h4>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Bus Name</th>
+                            <th>Route</th>
+                            <th>Departure</th>
+                            <th>Seats</th>
+                            <th>Price</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bus in buses %}
+                            <tr>
+                                <td>{{ bus.bus_name }}</td>
+                                <td>{{ bus.route }}</td>
+                                <td>{{ bus.departure_time }}</td>
+                                <td>{{ bus.total_seats }}</td>
+                                <td>KES {{ bus.price }}</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ url_for('main.edit_bus', bus_id=bus.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                        <form method="POST" action="{{ url_for('main.delete_bus', bus_id=bus.id) }}" onsubmit="return confirm('Remove this bus?');">
+                                            <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row gy-4">
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 p-4">
+            <h3 class="mb-3">Leave a Review</h3>
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Rating</label>
+                    <select name="rating" class="form-select" required>
+                        <option value="">Choose rating</option>
+                        {% for rating in range(1, 6) %}
+                            <option value="{{ rating }}">{{ rating }} stars</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Review</label>
+                    <textarea name="review_text" class="form-control" rows="5" required></textarea>
+                </div>
+                <button class="btn btn-primary">Submit Review</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 p-4">
+            <h3 class="mb-3">Recent Reviews</h3>
+            {% if reviews %}
+                <div class="list-group">
+                    {% for review in reviews %}
+                        <div class="list-group-item rounded-3 mb-2 shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong>{{ review.name }}</strong>
+                                <span class="badge bg-success">{{ review.rating }} / 5</span>
+                            </div>
+                            <p class="mb-1">{{ review.review_text }}</p>
+                            <small class="text-muted">{{ review.created_at.strftime('%Y-%m-%d') }}</small>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">No reviews yet. Be the first to share your experience.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

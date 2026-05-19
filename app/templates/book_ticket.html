@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card shadow-sm border-0 p-4">
+            <div class="d-flex align-items-start justify-content-between mb-4">
+                <div>
+                    <h3 class="mb-1">Reserve Your Seat</h3>
+                    <p class="text-muted mb-0">{{ bus.bus_name }} · {{ bus.route }} · {{ selected_date }} · {{ bus.departure_time }}</p>
+                </div>
+                <a href="{{ url_for('main.search_buses') }}" class="btn btn-link">Choose another bus</a>
+            </div>
+
+            <form method="POST">
+                <input type="hidden" name="bus_id" value="{{ bus.id }}">
+                <input type="hidden" name="travel_date" value="{{ selected_date }}">
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Passenger Name</label>
+                        <input type="text" name="passenger_name" class="form-control" placeholder="Full name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Route</label>
+                        <input type="text" class="form-control" value="{{ selected_route }}" readonly>
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Return Date (optional)</label>
+                        <input type="date" name="return_date" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Price</label>
+                        <input type="text" class="form-control" value="KES {{ bus.price | round(2) }}" readonly>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-semibold">Select Seat</span>
+                        <span class="text-muted">Available seats are clickable.</span>
+                    </div>
+                    <input type="hidden" name="seat_number" id="seat_number">
+                    <div class="bus-layout">
+                        <div class="row gx-2 gy-2 justify-content-center align-items-center text-center">
+                            <div class="col-12 mb-2">
+                                <div class="bus-header">Driver Front</div>
+                            </div>
+                            {% for row in seat_map %}
+                                <div class="col-12 d-flex justify-content-center">
+                                    {% for seat in row %}
+                                        {% if seat is none %}
+                                            <div class="seat-aisle"></div>
+                                        {% else %}
+                                            <button type="button"
+                                                    class="btn {% if seat in booked_seats %}btn-secondary{% else %}btn-outline-primary{% endif %} seat-btn me-2"
+                                                    {% if seat in booked_seats %}disabled{% else %}onclick="selectSeat('{{ seat }}', event){% endif %}">
+                                                {{ seat }}
+                                            </button>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-success w-100">Book Now</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

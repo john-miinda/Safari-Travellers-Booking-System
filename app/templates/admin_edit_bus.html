@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 p-4">
+            <h4>Edit Bus</h4>
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Bus Name</label>
+                    <input type="text" name="bus_name" class="form-control" value="{{ bus.bus_name }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Route</label>
+                    <input type="text" name="route" class="form-control" value="{{ bus.route }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Departure Time</label>
+                    <input type="text" name="departure_time" class="form-control" value="{{ bus.departure_time }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Total Seats</label>
+                    <input type="number" name="total_seats" class="form-control" value="{{ bus.total_seats }}" min="10" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Price (KES)</label>
+                    <input type="number" step="0.01" name="price" class="form-control" value="{{ bus.price }}" required>
+                </div>
+                <button class="btn btn-primary">Save Changes</button>
+                <a href="{{ url_for('main.manage_buses') }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
