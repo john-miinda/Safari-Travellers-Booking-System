@@ -10,6 +10,12 @@ function selectSeat(seat, el) {
     el.classList.remove('btn-outline-primary');
     el.classList.add('btn-success');
     el.classList.add('seat-selected');
+    
+    const bookBtn = document.getElementById('book_btn');
+    if (bookBtn) {
+        bookBtn.disabled = false;
+        bookBtn.classList.remove('disabled');
+    }
 }
 
 function seatButtonClick(event) {
@@ -26,7 +32,38 @@ function initSeatSelection() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', initSeatSelection);
+document.addEventListener('DOMContentLoaded', function() {
+    initSeatSelection();
+    const bookBtn = document.getElementById('book_btn');
+    if (bookBtn) {
+        bookBtn.disabled = true;
+        bookBtn.classList.add('disabled');
+    }
+});
+
+
+function validateBookingForm(event) {
+    const seatInput = document.getElementById('seat_number');
+    const passengerInput = document.querySelector('[name="passenger_name"]');
+    if (!seatInput || !seatInput.value.trim()) {
+        event.preventDefault();
+        alert('Please select a seat before booking.');
+        return false;
+    }
+    if (!passengerInput || !passengerInput.value.trim()) {
+        event.preventDefault();
+        alert('Please enter your name before booking.');
+        return false;
+    }
+    return true;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form[method="POST"]');
+    if (form) {
+        form.addEventListener('submit', validateBookingForm);
+    }
+});
 
 function autoRefresh() {
     const route = document.querySelector('[name="route"]').value;
