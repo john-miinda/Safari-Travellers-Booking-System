@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mb-4">
+    <h2 class="mb-3">📊 Admin Reports & Analytics</h2>
+    <p class="text-muted">Comprehensive overview of your booking system performance.</p>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-3">
+        <div class="card shadow-sm border-0 p-4 bg-primary text-white">
+            <h6 class="card-title">Total Revenue</h6>
+            <p class="display-6 mb-0">KES {{ total_revenue | round(2) }}</p>
+            <small>From all bookings</small>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="card shadow-sm border-0 p-4 bg-success text-white">
+            <h6 class="card-title">Total Bookings</h6>
+            <p class="display-6 mb-0">{{ total_bookings }}</p>
+            <small>All time</small>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="card shadow-sm border-0 p-4 bg-info text-white">
+            <h6 class="card-title">Completed Trips</h6>
+            <p class="display-6 mb-0">{{ completed_trips }}</p>
+            <small>Past travel dates</small>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="card shadow-sm border-0 p-4 bg-warning text-dark">
+            <h6 class="card-title">Upcoming Trips</h6>
+            <p class="display-6 mb-0">{{ upcoming_trips }}</p>
+            <small>Future bookings</small>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 p-4">
+            <h5 class="mb-4">Recent Bookings</h5>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Passenger</th>
+                            <th>Route</th>
+                            <th>Travel Date</th>
+                            <th>Seat</th>
+                            <th>Amount</th>
+                            <th>Date Booked</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in recent_bookings %}
+                            <tr>
+                                <td><small>{{ booking.user.fullname }}</small></td>
+                                <td><small>{{ booking.route }}</small></td>
+                                <td><small>{{ booking.travel_date }}</small></td>
+                                <td><small><span class="badge bg-primary">{{ booking.seat_number }}</span></small></td>
+                                <td><small>KES {{ booking.total_price | round(2) }}</small></td>
+                                <td><small>{{ booking.booked_at.strftime('%Y-%m-%d %H:%M') }}</small></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 p-4">
+            <h5 class="mb-4">Route Summary</h5>
+            <div class="list-group list-group-flush">
+                {% for route_stats in route_stats %}
+                    <div class="list-group-item px-0 py-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ route_stats.route }}</h6>
+                                <small class="text-muted">{{ route_stats.booking_count }} bookings</small>
+                            </div>
+                            <span class="badge bg-success">KES {{ route_stats.revenue | round(2) }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 p-4">
+            <h5 class="mb-4">Bus Utilization</h5>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Bus</th>
+                            <th>Route</th>
+                            <th>Total Seats</th>
+                            <th>Booked</th>
+                            <th>Occupancy %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bus in bus_stats %}
+                            <tr>
+                                <td><small>{{ bus.bus_name }}</small></td>
+                                <td><small>{{ bus.route }}</small></td>
+                                <td><small>{{ bus.total_seats }}</small></td>
+                                <td><small>{{ bus.booked_seats }}</small></td>
+                                <td>
+                                    <small>
+                                        {% set occupancy = (bus.booked_seats / bus.total_seats * 100) | int %}
+                                        <span class="badge {% if occupancy >= 80 %}bg-danger{% elif occupancy >= 50 %}bg-warning{% else %}bg-success{% endif %}">
+                                            {{ occupancy }}%
+                                        </span>
+                                    </small>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 p-4">
+            <h5 class="mb-4">Daily Bookings Trend</h5>
+            <div class="list-group list-group-flush">
+                {% for day_stat in daily_stats %}
+                    <div class="list-group-item px-0 py-3 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="fw-semibold">{{ day_stat.date.strftime('%Y-%m-%d') }}</small>
+                            </div>
+                            <div>
+                                <span class="badge bg-primary">{{ day_stat.count }} bookings</span>
+                                <span class="badge bg-success">KES {{ day_stat.revenue | round(2) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline-secondary">Back to Admin Dashboard</a>
+</div>
+{% endblock %}

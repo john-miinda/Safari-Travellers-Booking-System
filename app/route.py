@@ -368,6 +368,57 @@ def admin_dashboard():
     )
 
 
+@main.route('/admin/reports')
+@login_required
+def admin_reports():
+    if not current_user.is_admin_user:
+        abort(403)
+
+    total_bookings = Booking.query.count()
+    total_revenue = db.session.query(db.func.sum(Booking.total_price)).scalar() or 0
+
+    completed_trips = Booking.query.filter(Booking.travel_date < datetime.utcnow().date()).count()
+    upcoming_trips = Booking.query.filter(Booking.travel_date >= datetime.utcnow().date()).count()
+
+    recent_bookings = Booking.query.order_by(Booking.booked_at.desc()).limit(10).all()
+
+    route_stats = db.session.query(
+        Booking.route,
+        db.func.count(Booking.id).label('booking_count'),
+        db.func.sum(Booking.total_price).label('revenue')
+    ).group_by(Booking.route).all()
+    route_stats = [{'route': r[0], 'booking_count': r[1], 'revenue': r[2] or 0} for r in route_stats]
+
+    bus_stats = []
+    for bus in Bus.query.all():
+        booked_seats = Booking.query.filter_by(bus_id=bus.id).count()
+        bus_stats.append({
+            'bus_name': bus.bus_name,
+            'route': bus.route,
+            'total_seats': bus.total_seats,
+            'booked_seats': booked_seats
+        })
+
+    daily_stats = db.session.query(
+        db.func.date(Booking.booked_at).label('date'),
+        db.func.count(Booking.id).label('count'),
+        db.func.sum(Booking.total_price).label('revenue')
+    ).group_by(db.func.date(Booking.booked_at)).order_by(db.func.date(Booking.booked_at).desc()).limit(7).all()
+    daily_stats = [{'date': d[0], 'count': d[1], 'revenue': d[2] or 0} for d in daily_stats]
+
+    return render_template(
+        'admin_reports.html',
+        total_bookings=total_bookings,
+        total_revenue=total_revenue,
+        completed_trips=completed_trips,
+        upcoming_trips=upcoming_trips,
+        recent_bookings=recent_bookings,
+        route_stats=route_stats,
+        bus_stats=bus_stats,
+        daily_stats=daily_stats,
+    )
+
+
 @main.route('/admin/buses', methods=['GET', 'POST'])
 @login_required
 def manage_buses():
