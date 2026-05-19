@@ -42,7 +42,10 @@
                         <span class="fw-semibold">Select Seat</span>
                         <span class="text-muted">Available seats are clickable.</span>
                     </div>
-                    <input type="hidden" name="seat_number" id="seat_number">
+                    <div class="mb-3">
+                        <label class="form-label">Selected Seat</label>
+                        <input type="text" name="seat_number" id="seat_number" class="form-control" placeholder="Click a seat" readonly required>
+                    </div>
                     <div class="bus-layout">
                         <div class="row gx-2 gy-2 justify-content-center align-items-center text-center">
                             <div class="col-12 mb-2">
