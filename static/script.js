@@ -1,13 +1,15 @@
-function selectSeat(seat, event) {
-    document.getElementById('seat_number').value = seat;
+function selectSeat(seat, el) {
+    if (!el || el.disabled) return;
+    const hidden = document.getElementById('seat_number');
+    if (hidden) hidden.value = seat;
     document.querySelectorAll('.seat-btn').forEach(btn => {
         btn.classList.remove('seat-selected');
         btn.classList.remove('btn-success');
         btn.classList.add('btn-outline-primary');
     });
-    event.target.classList.remove('btn-outline-primary');
-    event.target.classList.add('btn-success');
-    event.target.classList.add('seat-selected');
+    el.classList.remove('btn-outline-primary');
+    el.classList.add('btn-success');
+    el.classList.add('seat-selected');
 }
 
 function autoRefresh() {

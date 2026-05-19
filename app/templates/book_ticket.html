@@ -54,9 +54,9 @@
                                         {% if seat is none %}
                                             <div class="seat-aisle"></div>
                                         {% else %}
-                                            <button type="button"
+                                                <button type="button"
                                                     class="btn {% if seat in booked_seats %}btn-secondary{% else %}btn-outline-primary{% endif %} seat-btn me-2"
-                                                    {% if seat in booked_seats %}disabled{% else %}onclick="selectSeat('{{ seat }}', event)"{% endif %}>
+                                                    {% if seat in booked_seats %}disabled{% else %}onclick="selectSeat('{{ seat }}', this)"{% endif %}>
                                                 {{ seat }}
                                             </button>
                                         {% endif %}
