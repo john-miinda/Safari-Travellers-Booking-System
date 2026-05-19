@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card p-4 shadow-sm">
+    <h1>All Bookings</h1>
+    {% if bookings %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Passenger</th>
+                    <th>Bus</th>
+                    <th>Route</th>
+                    <th>Travel Date</th>
+                    <th>Total Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.id }}</td>
+                        <td>{{ booking.passenger_name }}</td>
+                        <td>{{ booking.bus.bus_name }}</td>
+                        <td>{{ booking.route }}</td>
+                        <td>{{ booking.travel_date }}</td>
+                        <td>KES {{ booking.total_price }}</td>
+                        <td>
+                            <a href="{{ url_for('main.admin_booking_detail', booking_id=booking.id) }}" class="btn btn-sm btn-secondary">View</a>
+                            <form method="post" action="{{ url_for('main.admin_cancel_booking', booking_id=booking.id) }}" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-danger">Cancel</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No bookings available.</p>
+    {% endif %}
+</div>
+{% endblock %}

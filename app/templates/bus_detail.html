@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card p-4 shadow-sm">
+    <h1>{{ bus.bus_name }}</h1>
+    <p><strong>Route:</strong> {{ bus.route }}</p>
+    <p><strong>Departure Time:</strong> {{ bus.departure_time }}</p>
+    <p><strong>Total Seats:</strong> {{ bus.total_seats }}</p>
+    <p><strong>Price:</strong> KES {{ bus.price }}</p>
+    {% if travel_date %}
+        <p><strong>Availability for {{ travel_date }}:</strong>
+        {% if available is not none %}
+            {{ available }} seats available
+        {% else %}
+            Invalid date format
+        {% endif %}
+        </p>
+    {% endif %}
+    <a href="{{ url_for('main.book_ticket', bus_id=bus.id, travel_date=travel_date) }}" class="btn btn-success">Book this bus</a>
+</div>
+{% endblock %}

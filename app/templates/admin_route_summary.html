@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card p-4 shadow-sm">
+    <h1>Route Summary</h1>
+    {% if route_summary %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Route</th>
+                    <th>Bookings</th>
+                    <th>Revenue</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in route_summary %}
+                    <tr>
+                        <td>{{ item.route }}</td>
+                        <td>{{ item.bookings }}</td>
+                        <td>KES {{ item.revenue }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No route data available.</p>
+    {% endif %}
+</div>
+{% endblock %}

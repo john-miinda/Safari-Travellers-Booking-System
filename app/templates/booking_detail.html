@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card p-4 shadow-sm">
+    <h1>Booking #{{ booking.id }}</h1>
+    <p><strong>Passenger:</strong> {{ booking.passenger_name }}</p>
+    <p><strong>Bus:</strong> {{ booking.bus.bus_name }}</p>
+    <p><strong>Route:</strong> {{ booking.route }}</p>
+    <p><strong>Seat:</strong> {{ booking.seat_number }}</p>
+    <p><strong>Travel Date:</strong> {{ booking.travel_date }}</p>
+    {% if booking.return_date %}
+        <p><strong>Return Date:</strong> {{ booking.return_date }}</p>
+    {% endif %}
+    <p><strong>Total Price:</strong> KES {{ booking.total_price }}</p>
+    <p><strong>Round Trip:</strong> {{ 'Yes' if booking.is_round_trip else 'No' }}</p>
+    <a href="{{ url_for('main.booking_print', booking_id=booking.id) }}" class="btn btn-secondary">Print Ticket</a>
+</div>
+{% endblock %}
