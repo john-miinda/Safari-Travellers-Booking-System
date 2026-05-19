@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from urllib.parse import urlparse, parse_qs
 from flask import (
     Blueprint,
     render_template,
@@ -178,8 +179,33 @@ def book_ticket():
         return_date = request.form.get('return_date')
         bus_id = request.form.get('bus_id')
 
-        if not all([passenger_name, seat_number, travel_date, bus_id]):
-            flash('Passenger name, seat, travel date and bus are required', 'warning')
+        if not travel_date or not bus_id:
+            referrer = request.referrer
+            if referrer:
+                try:
+                    params = parse_qs(urlparse(referrer).query)
+                    travel_date = travel_date or params.get('travel_date', [None])[0]
+                    bus_id = bus_id or params.get('bus_id', [None])[0]
+                except Exception:
+                    pass
+
+        missing_fields = []
+        if not passenger_name:
+            missing_fields.append('passenger name')
+        if not seat_number:
+            missing_fields.append('seat')
+        if not travel_date:
+            missing_fields.append('travel date')
+        if not bus_id:
+            missing_fields.append('bus')
+
+        if missing_fields:
+            if len(missing_fields) == 1:
+                message = f'{missing_fields[0].capitalize()} is required'
+            else:
+                message = ', '.join(missing_fields[:-1]) + f' and {missing_fields[-1]}'
+                message = f'{message.capitalize()} are required'
+            flash(message, 'warning')
             return redirect(request.referrer or url_for('main.search_buses'))
 
         bus = Bus.query.get(bus_id)
